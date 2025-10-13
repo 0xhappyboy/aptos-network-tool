@@ -1,0 +1,23 @@
+[package]
+name = "aptos-network-tool"
+version = "0.1.0"
+edition = "2024"
+authors = ["happyboy <superhappyboy1995@gmail.com>"]
+description = "aptos network tool."
+keywords = ["trade", "crypto", "finance", "aptos", "aptos-tool"]
+license = "GPL-3.0"
+readme = "README.md"
+repository = "https://github.com/0xhappyboy/aptos-network-tool"
+
+[dependencies]
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1.0", features = ["full"] }
+hex = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha3 = "0.10"
+rand = "0.8"
+getrandom = "0.2"
+ring = "0.17"
+base64 = "0.21"
+bcs = "0.1.6"
