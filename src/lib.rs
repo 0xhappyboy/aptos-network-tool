@@ -212,6 +212,33 @@ pub mod address {
         let public_key = keypair.public_key().as_ref();
         public_key_to_auth_key(public_key)
     }
+
+    /// Standardized address format
+    pub fn normalize_address(address: &str) -> String {
+        if address.starts_with("0x") {
+            address.to_lowercase()
+        } else {
+            format!("0x{}", address.to_lowercase())
+        }
+    }
+
+    /// Verify address validity
+    pub fn is_valid_address(address: &str) -> bool {
+        if !address.starts_with("0x") {
+            return false;
+        }
+        let hex_part = &address[2..];
+        hex_part.len() == 64 && hex_part.chars().all(|c| c.is_ascii_hexdigit())
+    }
+
+    /// show short address
+    pub fn show_short_address(address: &str) -> String {
+        if address.len() <= 10 {
+            address.to_string()
+        } else {
+            format!("{}...{}", &address[0..6], &address[address.len() - 4..])
+        }
+    }
 }
 
 pub mod move_type {
@@ -385,5 +412,32 @@ pub mod move_type {
             result.push(parsed);
         }
         Ok(result)
+    }
+}
+
+pub mod codec {
+    use serde_json::Value;
+
+    /// bcs encode
+    pub fn bcs_encode<T: serde::Serialize>(value: &T) -> Result<Vec<u8>, String> {
+        bcs::to_bytes(value).map_err(|e| format!("BCS encoding failed: {}", e))
+    }
+
+    /// bcs decode
+    pub fn bcs_decode<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T, String> {
+        bcs::from_bytes(bytes).map_err(|e| format!("BCS decoding failed: {}", e))
+    }
+
+    /// encode move arguments
+    pub fn encode_move_arguments(args: &[Value]) -> Result<Vec<Vec<u8>>, String> {
+        let mut encoded = Vec::new();
+        for arg in args {
+            if let Some(str_val) = arg.as_str() {
+                encoded.push(str_val.as_bytes().to_vec());
+            } else {
+                return Err("Only string arguments are supported".to_string());
+            }
+        }
+        Ok(encoded)
     }
 }
